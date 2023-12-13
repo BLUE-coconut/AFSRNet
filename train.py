@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+#os.environ['CUDA_VISIBLE_DEVICES']='0'
 
 from PIL import Image, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -88,22 +88,18 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
             oRescaleT(320),
             oRandomCrop(288),
             oToTensorLab(flag=0)]))
-    salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=1, drop_last=True) #shuffle=True 乱序
+    salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=4, drop_last=True) #shuffle=True 乱序
 
     # ------- 3. define model --------
     
     net = get_model(save_name)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    net = nn.DataParallel(net)
+    net.to(device)
         
 
     if(resume_dir):
-        if torch.cuda.is_available():
-            net.load_state_dict(torch.load(resume_dir),strict = False)
-            net.cuda()
-        else:
-            net.load_state_dict(torch.load(resume_dir, map_location='cpu'),strict = False)
-    else:       
-        if torch.cuda.is_available():
-            net.cuda()
+        net.load_state_dict(torch.load(resume_dir, map_location=device),strict = False)
       
 
     # ------- 4. define optimizer --------

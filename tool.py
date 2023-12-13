@@ -8,7 +8,6 @@ import numpy as np
 import glob
 
 from model import *
-from BasicIRSTD.model import *
 
 
 def get_test_data(data_name):
@@ -259,160 +258,19 @@ def get_model(save_name):
     elif(save_name[:5] == 'halfb'):
         print("net : halfbranch")
         net = halfbranch(3, 1)
-    elif(save_name[:5] == 'woadf'):
-        print("net : woADF")
-        net = woADF(3, 1)
+    elif(save_name[:5] == 'woaff'):
+        print("net : woAFF")
+        net = woAFF(3, 1)
     elif(save_name[:4] == 'woDB'):
         print("net : woDB")
         net = woDB(3, 1)
-    
+    elif(save_name[:4] == 'woSR'):
+        print("net : woSR")
+        net = woSR(3, 1)
     elif (save_name[:6] == 'uiunet'):
         print("net : UIUNET")
         net = UIUNET(3, 1)
-    elif(save_name[:5] == 'ISNet'):
-        print("net : ISNet")
-        net = ISNet(mode=mode)
-    elif(save_name[:5] == 'ISTDU'):
-        print("net : ISTDU-Net")
-        net = ISTDU_Net(3)
-    elif(save_name[:5] == 'RDIAN'):
-        print("net : ISNet")
-        net = RDIAN()
-    elif(save_name[:3] == 'ACM'):
-        print("net : ACMNet")
-        net = ACM()
-    elif(save_name[:3] == 'ALC'):
-        print("net : ALCNet")
-        net = ALCNet()
-    elif(save_name[:3] == 'DNA'):
-        print("net : DNANet")
-        net = DNANet(mode=mode)
-
-
-    elif (save_name[:5] == 'hhl30'):
-        print("net : hhl30")
-        net = UIUNET_New(3, 1)
-    elif (save_name[:5] == 'hhl31'):
-        print("net : hhl31")
-        net = HHL3_1(3, 1)
-    elif (save_name[:5] == 'hhl32'):
-        print("net : hhl32")
-        net = HHL3_2(3, 1)
-    elif (save_name[:4] == 'hhl4'):
-        print("net : hhl4")
-        net = UIUNET_hhl4(3, 1)
-
-
-
-    elif (save_name[:5] == 'hhl54'):
-        print("net : hhl54")
-        net = HHL5_RH65_ADF_4(3, 1)
-    elif (save_name[:5] == 'hhl55'):
-        print("net : hhl55")
-        net = HHL5_RH65_ADF_5(3, 1)
-    elif (save_name[:5] == 'hhl56'):
-        print("net : hhl56")
-        net = HHL5_RH65_ADF_6(3, 1)
-    elif (save_name[:5] == 'hhl51'):
-        print("net : hhl51")
-        net = HHL5_RH65_ADF_2(3, 1)
-    elif (save_name[:5] == 'hhl52'):
-        print("net : hhl52")
-        net = HHL5_RH65_ADF_3(3, 1)
-    elif (save_name[:5] == 'hhl50'):
-        print("net : hhl50")
-        net = HHL5_RH65_ADF_0(3, 1)
-    elif (save_name[:4] == 'hhl5'):
-        print("net : hhl5")
-        net = HHL5_RH65_ADF_(3, 1)
-
-    elif(save_name[:5] == 'hhl61'):
-        print("net : hhl61")
-        net = HHL6_RH65_ADF_1(3, 1)
-
-    elif(save_name[:7] == 'hhl6con'):
-        print("net : hhl6con")
-        net = HHL6_RH65_ADF_con6(3, 1)
-    elif(save_name[:7] == 'hhl6nor'):
-        print("net : hhl6nor")
-        net = HHL6_RH65_ADF_1_norm(3, 1)
-
-    elif (save_name[:5] == 'hhl62'):
-        print("net : hhl62")
-        net = HHL6_RH65_ADF_2(3, 1)
-    elif (save_name[:5] == 'hhl63'):
-        print("net : hhl63")
-        net = HHL6_RH65_ADF_3(3, 1)
-    elif (save_name[:5] == 'hhl65'):
-        print("net : hhl65")
-        net = HHL6_RH65_ADF_5(3, 1)
-    elif (save_name[:5] == 'hhl66'):
-        print("net : hhl66")
-        net = HHL6_RH65_ADF_6(3, 1)
-
-    elif (save_name[:4] == 'UCF0'):
-        print("net : UCF_NET0")
-        net = UCF_NET(3, 1)
-    elif (save_name[:7] == 'UCF1nor'):
-        print("net : UCFADF_norm_NET")
-        net = UCFADF_norm_NET(3, 1)
-    elif (save_name[:4] == 'UCF1'):
-        print("net : UCFADF_NET")
-        net = UCFADF_NET(3, 1)
-    elif (save_name[:5] == 'RH650'):
-        print("net :RH_650")
-        net = RH_65_0(3, 1)
-    elif (save_name[:5] == 'RH651'):
-        print("net : RH_65_1_cor")
-        net = RH_65_1(3, 1)
-    elif (save_name[:5] == 'RH652'):
-        print("net : RH_652")
-        net = RH_65_2(3, 1)
-    elif (save_name[:4] == 'RH65'):
-        print("net : RH_65")
-        net = UIUNET_New_RH_65Image(3, 1)
-    elif (save_name[:5] == 'UCFRH'):
-        print("net : UCF_RH65_cor")
-        net = UCF_RH65_cor(3, 1)
-
-    elif (save_name[:4] == 'RH35'):
-        print("net : UIUNET_New_RH_35")
-        net = UIUNET_New_RH_35Image(3, 1)
-    elif (save_name[:4] == 'RH45'):
-        print("net : UIUNET_New_RH_45")
-        net = UIUNET_New_RH_45Image(3, 1)
-
-    elif (save_name[:4] == 'RQ44'):
-        print("net : UIUNET_New_RQ_44")
-        net = UIUNET_New_RQ_44Image(3, 1)
-    elif (save_name[:4] == 'DR66'):
-        print("net : UIUNET_New_DR_66")
-        net = UIUNET_New_DR_66Image(3, 1)
-    elif (save_name[:6] == 'DRH665'):
-        print("net : UIUNET_New_DRH_665")
-        net = UIUNET_New_DRH_665Image(3, 1)
-
-    elif (save_name[:6] == 'RHmt20'):
-        print("net : UIUNET_Mutual_RH_65Image2_0")
-        net = UIUNET_Mutual_RH_65Image2_0(3, 1)
-    elif (save_name[:6] == 'RHmt21'):
-        print("net : UIUNET_Mutual_RH_65Image2_1")
-        net = UIUNET_Mutual_RH_65Image2_1(3, 1)
-    elif (save_name[:4] == 'RHmt'):
-        print("net : UIUNET_Mutual_RH_65Image")
-        net = UIUNET_Mutual_RH_65Image(3, 1)
-
-    elif (save_name[:4] == 'Udet'):
-        print("net : UIUNET_Udetail")
-        net = UIUNET_Udetail(3, 1)
-
-    elif(save_name[:4]=='3SFR'):
-        print("net : Dual_ADF_3SFR_1")
-        net = Dual_ADF_3SFR_1(3,1)
-    elif(save_name[:4]=='UCF3'):
-        print("net : UCF_3SFR_NET")
-        net = UCF_3SFR_NET(3,1)
-
+    
     else:
         raise KeyError("net not exist")
 

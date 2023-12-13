@@ -396,14 +396,14 @@ class MFSRNet(nn.Module):
         self.con2 = con_up_fusion3(128, 128)
         self.con1 = con_up_fusion3(64, 64)
 
+        self.con_upd6 = Conv1x1(1024, 512)
         self.con_upd5 = Conv3x3(512, 512)
         self.con_upd4 = Conv3x3(512, 512)
         self.con_upd3 = Conv3x3(256, 256)
         self.con_upd2 = Conv3x3(128, 128)
         self.con_upd1 = Conv3x3(64, 64)
 
-        self.ADF_cup_fuse6 = Conv1x1(1024, 512)
-
+        
         self.stage5d = RSU4F(1024, 256, 512)
         self.stage4d = RSU4(1024, 128, 256)
         self.stage3d = RSU5(512, 64, 128)
@@ -447,7 +447,7 @@ class MFSRNet(nn.Module):
         return fuse_layer
 
     def Adaptive_fuse(self, fnum, in_ch, mid_ch, out_ch):
-        adfuse = AdaptiveFuse2(fnum=fnum, in_ch=in_ch, mid_ch=mid_ch, out_ch=out_ch)
+        adfuse = AdaptiveFuse(fnum=fnum, in_ch=in_ch, mid_ch=mid_ch, out_ch=out_ch)
         return adfuse
 
     def forward(self, x):
@@ -494,7 +494,7 @@ class MFSRNet(nn.Module):
         hx6 = self.adfuse6([hx16, hx26, hx36, hx46, hx66, hx76, hx86, hx96, hx116])  # 512
 
         
-        hx6d = self.ADF_cup_fuse6(torch.cat((hx66, hx6), 1))
+        hx6d = self.con_upd6(torch.cat((hx66, hx6), 1))
         hx6dup = _upsample_like(hx6d, hx5)  # 512 + 512 = 1024 --> 512
         # -------------------- decoder --------------------
 

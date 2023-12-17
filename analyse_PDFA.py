@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+os.environ['CUDA_VISIBLE_DEVICES']='1'
 from skimage import io, transform
 import torch
 import torchvision
@@ -15,9 +15,8 @@ from PIL import Image
 import glob
 import time
 import cv2
-from tqdm import tqdm
+
 import torch.utils.data as Data
-from utils.data import SirstDataset
 
 #from thop import profile
 
@@ -64,7 +63,7 @@ def main(image_name_list,label_name_list,para_name,save_name,prediction_dir):
 
     # --------- 1. get image path and name ---------
     
-    model_dir = os.path.join(os.getcwd(), 'saved_models', save_name , para_name)
+    model_dir = os.path.join('/root', 'autodl-tmp','saved_models', save_name , para_name)
     print("analysing:",model_dir)
 
     # --------- 2. dataloader ---------
@@ -80,15 +79,12 @@ def main(image_name_list,label_name_list,para_name,save_name,prediction_dir):
 
     # --------- 3. model define ---------
     net = get_model(save_name)
-    
-
-    if torch.cuda.is_available():
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    net = nn.DataParallel(net)
+    net.to(device)
         
-        net.load_state_dict(torch.load(model_dir))
-        net.cuda()
-        net = nn.DataParallel(net)
-    else:
-        net.load_state_dict(torch.load(model_dir, map_location='cpu'))
+
+    net.load_state_dict(torch.load(model_dir, map_location=device),strict = True)
     net.eval()
 
     # --------- 4. inference for each image ---------
@@ -173,14 +169,14 @@ if __name__ == "__main__":
     best_pth = None
     
     # dataset:  /sirst/sirst_new/synthetic/IRSTD/NUDT-SIRST
-    data_name = 'sirst50'
+    data_name = 'NUDT-SIRST'
     image_name_list,label_name_list = get_test_data(data_name)
     print(f"---------------{data_name}----------------")
     # model:
     model_name = 'MFSRNet'
-    save_name = model_name + '_' + 'nuaa'
+    save_name = model_name + '_' + 'NUDT'
     # dir:
-    root_dir = os.listdir(os.path.join(os.getcwd(), 'saved_models', save_name))
+    root_dir = os.listdir(os.path.join('/root', 'autodl-tmp', 'saved_models', save_name))
     root_dir.sort()
     # prediction_dir = os.path.join(os.getcwd(), 'Predictions', data_name , model_name + os.sep)
     
@@ -222,14 +218,14 @@ if __name__ == "__main__":
     
     for pth_id,pap in enumerate(root_dir):
         x = pap.split('_')
-        if(len(x) < 5):
+        if(len(x) < 4):
             continue
-        itern = x[5]
+        itern = x[4]
         print('---',itern,' iter')
         IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,pap,save_name=save_name,prediction_dir=None)
         if(IoU > best_iou):
-              best_iou = IoU
-              best_1 = itern
+            best_iou = IoU
+            best_1 = itern
         if(nIoU > best_nioU):
             best_nioU = nIoU
             best_2 = itern
@@ -254,7 +250,7 @@ if __name__ == "__main__":
     #IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,'hhl6con_IRSTD_IRSTD_bce_itr_29000_train_0.003714_tar_0.000249.pth',save_name=save_name,prediction_dir=prediction_dir)
     #IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,'hhl61_IRSTD2_IRSTD_bce_itr_116000_train_0.002761_tar_0.000025.pth',save_name=save_name,prediction_dir=prediction_dir)
     #IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,'RH652_sirst50_sirst50_bce_itr_38000_train_0.004062_tar_0.000072.pth',save_name=save_name,prediction_dir=prediction_dir)
-    #IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,'u2conv_sirst50_sirst50_bce_itr_38000_train_0.004020_tar_0.000079.pth',save_name=save_name,prediction_dir=prediction_dir)
+    #IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,'u2net_sirst50_bce_itr_36000.pth',save_name=save_name,prediction_dir=prediction_dir)
     IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,root_dir[best_pth],save_name=save_name,prediction_dir=prediction_dir)
 
     #IoU, nIoU, _, _,PD, FA = main(image_name_list,label_name_list,"hhl61_sirst50_sirst50_bce_itr_40000_train_0.004160_tar_0.000079.pth",save_name=save_name,prediction_dir=prediction_dir)

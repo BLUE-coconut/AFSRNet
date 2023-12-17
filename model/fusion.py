@@ -45,9 +45,9 @@ class AdaptiveFuse(nn.Module):
         if(len(features)!=self.fnum):
             raise KeyError('Input features dim is wrong')
         hx = torch.cat([self.reduct[i](features[i]) for i in range(self.fnum)],dim = 1)
-        x_max = self.pool_1(hx)
-        x_avg = self.pool_2(hx)
-        xw = self.conv1(torch.cat([x_max,x_avg],dim = 1))
+        x_avg = self.pool_1(hx)
+        x_max = self.pool_2(hx)
+        xw = self.conv1(torch.cat([x_avg,x_max],dim = 1))
         hx = hx * xw
         x_out = self.out_neck(hx)
         return x_out

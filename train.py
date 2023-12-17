@@ -1,5 +1,5 @@
 import os
-#os.environ['CUDA_VISIBLE_DEVICES']='0'
+os.environ['CUDA_VISIBLE_DEVICES']='1'
 
 from PIL import Image, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -54,11 +54,11 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
     # ------- 2. set the directory of training dataset --------
     
     if(resume_name and resume_file):
-        resume_dir = os.path.join(os.getcwd(), 'saved_models', resume_name, resume_file)
+        resume_dir = os.path.join('/root', 'autodl-tmp', 'saved_models', resume_name, resume_file)
     else:
         resume_dir = None
         
-    model_dir = os.path.join(os.getcwd(), 'saved_models', save_name + os.sep)
+    model_dir = os.path.join('/root', 'autodl-tmp','saved_models', save_name + os.sep)
     print("resume dir:{}".format(resume_dir))
     print("save dir:{}".format(model_dir))
     if(not os.path.exists(model_dir)):
@@ -104,11 +104,11 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
 
     # ------- 4. define optimizer --------
     print("---define optimizer...")
-    optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
+    optimizer = optim.Adam(net.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
 
     # ------- 5. training process --------
     print("---start training...")
-    ite_num = 0
+    ite_num = 101000
     running_loss = 0.0
     running_tar_loss = 0.0
     ite_num4val = 0
@@ -155,7 +155,7 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
             iter_loss.append(running_loss / ite_num4val)
 
             if ite_num % save_frq == 0:
-                torch.save(net.state_dict(), model_dir + save_name +'_'+datas+"_bce_itr_%d_train_%3f_tar_%3f.pth" % (ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val))
+                torch.save(net.state_dict(), model_dir + save_name +"_bce_itr_%d.pth" % (ite_num))
                 running_loss = 0.0
                 running_tar_loss = 0.0
                 net.train()  # resume train
@@ -164,5 +164,5 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
     draw_loss(iter_num,iter_loss,"loss_picture_{}_{}".format(save_name,datas),save_name,datas)
 
 if __name__ == '__main__':
-    # dataset:  sirst/sirst_all/synthetic/IRSTD/NUDT-SIRST/sirst50
-    train(datas="IRSTD",save_name="MFSRNet_IRSTD",epoch_num=600,save_frq=1000,batch_size_train = 3) #,resume_name = 'hhl610_IRSTD',resume_file = "hhl61_IRSTD_IRSTD_bce_itr_60000_train_0.003263_tar_0.000155.pth"
+    # dataset:  IRSTD/NUDT-SIRST/sirst50
+    train(datas="NUDT",save_name="MFSRNet_NUDT",epoch_num=750,save_frq=1000,batch_size_train = 3, resume_name = 'MFSRNet_NUDT',resume_file = "MFSRNet_NUDT_bce_itr_101000.pth") #

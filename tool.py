@@ -11,8 +11,8 @@ from model import *
 
 
 def get_test_data(data_name):
-    if (data_name == "sirst"):
-        test_txt = "/home/hehaolan/Multilevel_U2net_ISTD/BasicIRSTD/datasets/NUAA-SIRST/img_idx/test_NUAA-SIRST_20.txt"
+    if (data_name == "sirst50"):
+        test_txt = "sirst/list/test_NUAA-SIRST.txt"
         img_dir = "sirst/images/"
         lbl_dir = "sirst/masks/"
         with open(test_txt) as f:
@@ -33,49 +33,6 @@ def get_test_data(data_name):
         for i in need:
             image_name_list.append(img_dict[i])
             label_name_list.append(lbl_dict[i])
-    elif (data_name == "sirst50"):
-        test_txt = "/home/hehaolan/Multilevel_U2net_ISTD/BasicIRSTD/datasets/NUAA-SIRST/img_idx/test_NUAA-SIRST_50.txt"
-        img_dir = "sirst/images/"
-        lbl_dir = "sirst/masks/"
-        with open(test_txt) as f:
-            lines = f.readlines()
-            need = [i.strip().split('_')[1] for i in lines]
-
-        img_name_list = glob.glob(img_dir + '*.png')
-        lbl_name_list = glob.glob(lbl_dir + '*.png')
-        img_dict = dict()
-        lbl_dict = dict()
-        for i in img_name_list:
-            img_dict[i.split('_')[1].split('.')[0]] = i
-        for i in lbl_name_list:
-            lbl_dict[i.split('_')[1]] = i
-
-        image_name_list = []
-        label_name_list = []
-        for i in need:
-            image_name_list.append(img_dict[i])
-            label_name_list.append(lbl_dict[i])
-    elif (data_name == "sirst_new"):
-        data_dir = "test_data/Quantification_Results/test_images"
-        dirs = os.listdir(data_dir)
-        img_dir = "test_data/Quantification_Results/test_images"
-        lbl_dir = "test_data/Quantification_Results/test_labels"
-        image_name_list = []
-        label_name_list = []
-        for img_name in dirs:
-            image_name_list.append(os.path.join(img_dir, img_name))
-            label_name_list.append(os.path.join(lbl_dir, img_name.split('.')[0] + '_pixels0.png'))
-
-    elif (data_name == "synthetic"):
-        data_dir = "data/test_gt"
-        dirs = os.listdir(data_dir)
-        img_dir = "data/test_org/"
-        lbl_dir = "data/test_gt/"
-        image_name_list = []
-        label_name_list = []
-        for img_name in dirs:
-            image_name_list.append(os.path.join(img_dir, img_name))
-            label_name_list.append(os.path.join(lbl_dir, img_name))
 
     elif (data_name == 'IRSTD'):
         train_txt = "IRSTD-1k/test.txt"
@@ -130,17 +87,8 @@ def get_test_data(data_name):
 
 
 def get_train_data(data_name):
-    if (data_name == 'synthetic'):
-        data_dir = os.path.join(os.getcwd(), 'data', 'training')
-        data_dir += '/'
-        image_ext = '1.png'
-        label_ext = '2.png'
-        tra_img_name_list = glob.glob(data_dir + '*' + image_ext)
-        tra_lbl_name_list = glob.glob(data_dir + '*' + label_ext)
-        tra_img_name_list.sort()
-        tra_lbl_name_list.sort()
-    elif (data_name == 'sirst'):
-        test_txt = os.path.join("sirst", "idx_427", "trainval.txt")
+    if (data_name == 'sirst50'):
+        test_txt = "sirst/list/train_NUAA-SIRST.txt"
         img_dir = "sirst/images/"
         lbl_dir = "sirst/masks/"
         with open(test_txt) as f:
@@ -161,40 +109,7 @@ def get_train_data(data_name):
         for i in need:
             tra_img_name_list.append(img_dict[i])
             tra_lbl_name_list.append(lbl_dict[i])
-    elif (data_name == 'sirst50'):
-        test_txt = "/home/hehaolan/Multilevel_U2net_ISTD/BasicIRSTD/datasets/NUAA-SIRST/img_idx/test_NUAA-SIRST_50.txt"
-        img_dir = "sirst/images/"
-        lbl_dir = "sirst/masks/"
-        with open(test_txt) as f:
-            lines = f.readlines()
-            need = [i.strip().split('_')[1] for i in lines]
-
-        img_name_list = glob.glob(img_dir + '*.png')
-        lbl_name_list = glob.glob(lbl_dir + '*.png')
-        img_dict = dict()
-        lbl_dict = dict()
-        for i in img_name_list:
-            img_dict[i.split('_')[1].split('.')[0]] = i
-        for i in lbl_name_list:
-            lbl_dict[i.split('_')[1]] = i
-
-        tra_img_name_list = []
-        tra_lbl_name_list = []
-        for i in need:
-            tra_img_name_list.append(img_dict[i])
-            tra_lbl_name_list.append(lbl_dict[i])
-    elif (data_name == 'sirst_all'):
-        img_dir = "sirst/images"
-        lbl_dir = "sirst/masks"
-        imgs = os.listdir(img_dir)
-        lbls = os.listdir(lbl_dir)
-        tra_img_name_list = []
-        tra_lbl_name_list = []
-        for img_name in imgs:
-            lbl_name = img_name.split('.')[0] + '_pixels0.png'
-            if (lbl_name in lbls):
-                tra_img_name_list.append(os.path.join(img_dir, img_name))
-                tra_lbl_name_list.append(os.path.join(lbl_dir, lbl_name))
+            
     elif (data_name == 'IRSTD'):
         train_txt = "IRSTD-1k/trainval.txt"
         img_dir = "IRSTD-1k/IRSTD1k_Img/"
@@ -258,7 +173,7 @@ def get_model(save_name):
     elif(save_name[:5] == 'halfb'):
         print("net : halfbranch")
         net = halfbranch(3, 1)
-    elif(save_name[:5] == 'woaff'):
+    elif(save_name[:5] == 'woAFF'):
         print("net : woAFF")
         net = woAFF(3, 1)
     elif(save_name[:4] == 'woDB'):

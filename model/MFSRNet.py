@@ -7,9 +7,9 @@ from .fusion import *
 # 图像 multilevel：Raw(RSU*6) + Half-maxpool(尺寸为1/2,RSU*5)
 
 
-class con_up_fusion3(nn.Module):
+class con_up_fusion(nn.Module):
     def __init__(self, in_ch=3, out_ch=3, dirate=1):
-        super(con_up_fusion3, self).__init__()
+        super(con_up_fusion, self).__init__()
         self.confuse = nn.Sequential(
         nn.Conv2d(in_ch,out_ch,1,padding=0),
         nn.BatchNorm2d(out_ch),
@@ -390,11 +390,11 @@ class MFSRNet(nn.Module):
         self.stage11 = RSU4F(256, 128, 256)
 
         # decoder
-        self.con5 = con_up_fusion3(512, 512)
-        self.con4 = con_up_fusion3(512, 512)
-        self.con3 = con_up_fusion3(256, 256)
-        self.con2 = con_up_fusion3(128, 128)
-        self.con1 = con_up_fusion3(64, 64)
+        self.con5 = con_up_fusion(512, 512)
+        self.con4 = con_up_fusion(512, 512)
+        self.con3 = con_up_fusion(256, 256)
+        self.con2 = con_up_fusion(128, 128)
+        self.con1 = con_up_fusion(64, 64)
 
         self.con_upd6 = Conv1x1(1024, 512)
         self.con_upd5 = Conv3x3(512, 512)
@@ -432,19 +432,6 @@ class MFSRNet(nn.Module):
         self.outconv = nn.Conv2d(6 * out_ch, out_ch, 1)
 
         self.poola = nn.MaxPool2d(2, 2, ceil_mode=True)
-
-    def _fuse_layer(self, in_high_channels, in_low_channels, out_channels, fuse_mode='AsymBi'):  # fuse_mode='AsymBi'
-        # assert fuse_mode in ['BiLocal', 'AsymBi', 'BiGlobal']
-        # if fuse_mode == 'BiLocal':
-        #     fuse_layer = BiLocalChaFuseReduce(in_high_channels, in_low_channels, out_channels)
-        # el
-        if fuse_mode == 'AsymBi':
-            fuse_layer = AsymBiChaFuseReduce(in_high_channels, in_low_channels, out_channels)
-        # elif fuse_mode == 'BiGlobal':
-        #     fuse_layer = BiGlobalChaFuseReduce(in_high_channels, in_low_channels, out_channels)
-        else:
-            raise KeyError()
-        return fuse_layer
 
     def Adaptive_fuse(self, fnum, in_ch, mid_ch, out_ch):
         adfuse = AdaptiveFuse(fnum=fnum, in_ch=in_ch, mid_ch=mid_ch, out_ch=out_ch)

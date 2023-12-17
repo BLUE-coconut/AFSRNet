@@ -457,12 +457,12 @@ class woAFF(nn.Module):
         hx116, _ = self.stage11(self.pool1011(hx105))
 
         # bottle neck
-        hx1 = self.adfuse1([hx11])
-        hx2 = self.adfuse2([hx12, hx22, hx72])
-        hx3 = self.adfuse3([hx13, hx23, hx33, hx73, hx83])
-        hx4 = self.adfuse4([hx14, hx24, hx34, hx44, hx74, hx84, hx94])
-        hx5 = self.adfuse5([hx15, hx25, hx35, hx45, hx55, hx75, hx85, hx95, hx105])
-        hx6 = self.adfuse6([hx16, hx26, hx36, hx46, hx66, hx76, hx86, hx96, hx116])
+        hx1 = self.adfuse1(hx11)
+        hx2 = self.adfuse2(torch.cat([hx12, hx22, hx72],1))
+        hx3 = self.adfuse3(torch.cat([hx13, hx23, hx33, hx73, hx83],1))
+        hx4 = self.adfuse4(torch.cat([hx14, hx24, hx34, hx44, hx74, hx84, hx94],1))
+        hx5 = self.adfuse5(torch.cat([hx15, hx25, hx35, hx45, hx55, hx75, hx85, hx95, hx105],1))
+        hx6 = self.adfuse6(torch.cat([hx16, hx26, hx36, hx46, hx66, hx76, hx86, hx96, hx116],1))
 
         hx6dup = _upsample_like(self.con_upd6(torch.cat((hx66, hx6), 1)),hx5)
         # -------------------- decoder --------------------
@@ -470,29 +470,29 @@ class woAFF(nn.Module):
         # fusec51,fusec52 = self.fuse5(hx6up, hx5)
         # hx5d = self.stage5d(torch.cat((fusec51, fusec52),1))[0]
 
-        con_up5 = self.con_upd5(self.con5(hx55, hx5))  # 512
+        con_up5 = self.con_upd5(self.con5(hx55)+hx5)  # 512
         hx5d = self.stage5d(torch.cat((con_up5, hx6dup), 1))[0]  # 512 + 512 = 1024 --> 512
         hx5dup = _upsample_like(hx5d, hx4)
 
         # fusec41,fusec42 = self.fuse4(hx5dup, hx4)
         # hx4d = self.stage4d(torch.cat((fusec41,fusec42),1))[0]
-        con_up4 = self.con_upd4(self.con4(hx44, hx4))  # 512
+        con_up4 = self.con_upd4(self.con4(hx44)+hx4)  # 512
         hx4d = self.stage4d(torch.cat((con_up4, hx5dup), 1))[0]  # 512 + 512 = 1024 --> 256
         hx4dup = _upsample_like(hx4d, hx3)
 
         # fusec31,fusec32 = self.fuse3(hx4dup, hx3)
         # hx3d = self.stage3d(torch.cat((fusec31,fusec32),1))[0]
-        con_up3 = self.con_upd3(self.con3(hx33, hx3))  # 256
+        con_up3 = self.con_upd3(self.con3(hx33)+hx3)  # 256
         hx3d = self.stage3d(torch.cat((con_up3, hx4dup), 1))[0]  # 256 + 256 --> 128
         hx3dup = _upsample_like(hx3d, hx2)
 
         # fusec21, fusec22 = self.fuse2(hx3dup, hx2)
         # hx2d = self.stage2d(torch.cat((fusec21, fusec22), 1))[0]
-        con_up2 = self.con_upd2(self.con2(hx22, hx2))  # 128
+        con_up2 = self.con_upd2(self.con2(hx22)+hx2)  # 128
         hx2d = self.stage2d(torch.cat((con_up2, hx3dup), 1))[0]  # 128 + 128 --> 64
         hx2dup = _upsample_like(hx2d, hx1)
 
-        con_up1 = self.con_upd1(self.con1(hx11, hx1))  # 64
+        con_up1 = self.con_upd1(self.con1(hx11)+hx1)  # 64
         hx1d = self.stage1d(torch.cat((con_up1, hx2dup), 1))[0]  # 64 + 64 --> 64
 
         # side output
@@ -518,12 +518,12 @@ class woAFF(nn.Module):
         return F.sigmoid(d0), F.sigmoid(d1), F.sigmoid(d2), F.sigmoid(d3), F.sigmoid(d4), F.sigmoid(d5), F.sigmoid(d6)
 
     
-class woSFR(nn.Module):
+class woSR(nn.Module):
     # image multilevel
     # with ADF
     # no 1/2 connection
     def __init__(self, in_ch=3, out_ch=1):
-        super(woSFR, self).__init__()
+        super(woSR, self).__init__()
         # level1: raw image
         self.stage1 = RSU7(in_ch, 32, 64)
         self.pool12 = nn.MaxPool2d(2, stride=2, ceil_mode=True)
@@ -803,29 +803,29 @@ class woDB(nn.Module):
 
         # fusec51,fusec52 = self.fuse5(hx6up, hx5)
         # hx5d = self.stage5d(torch.cat((fusec51, fusec52),1))[0]
-        con_up5 = self.con_upd5(self.con5(hx55, hx5))  # 512
+        con_up5 = self.con_upd5(self.con5(hx55)+hx5)  # 512
         hx5d = self.stage5d(torch.cat((con_up5, hx6dup), 1))[0]  # 512 + 512 = 1024 --> 512
         hx5dup = _upsample_like(hx5d, hx4)
 
         # fusec41,fusec42 = self.fuse4(hx5dup, hx4)
         # hx4d = self.stage4d(torch.cat((fusec41,fusec42),1))[0]
-        con_up4 = self.con_upd4(self.con4(hx44, hx4))  # 512
+        con_up4 = self.con_upd4(self.con4(hx44)+hx4)  # 512
         hx4d = self.stage4d(torch.cat((con_up4, hx5dup), 1))[0]  # 512 + 512 = 1024 --> 256
         hx4dup = _upsample_like(hx4d, hx3)
 
         # fusec31,fusec32 = self.fuse3(hx4dup, hx3)
         # hx3d = self.stage3d(torch.cat((fusec31,fusec32),1))[0]
-        con_up3 = self.con_upd3(self.con3(hx33, hx3))  # 256
+        con_up3 = self.con_upd3(self.con3(hx33)+hx3)  # 256
         hx3d = self.stage3d(torch.cat((con_up3, hx4dup), 1))[0]  # 256 + 256 --> 128
         hx3dup = _upsample_like(hx3d, hx2)
 
         # fusec21, fusec22 = self.fuse2(hx3dup, hx2)
         # hx2d = self.stage2d(torch.cat((fusec21, fusec22), 1))[0]
-        con_up2 = self.con_upd2(self.con2(hx22, hx2))  # 128
+        con_up2 = self.con_upd2(self.con2(hx22)+hx2)  # 128
         hx2d = self.stage2d(torch.cat((con_up2, hx3dup), 1))[0]  # 128 + 128 --> 64
         hx2dup = _upsample_like(hx2d, hx1)
 
-        con_up1 = self.con_upd1(self.con1(hx11, hx1))  # 64
+        con_up1 = self.con_upd1(self.con1(hx11)+hx1)  # 64
         hx1d = self.stage1d(torch.cat((con_up1, hx2dup), 1))[0]  # 64 + 64 --> 64
 
 
@@ -940,12 +940,12 @@ class U2NET_conv(nn.Module):
 
 
         #bottle neck
-        hx1 = self.adfuse1([hx11])
-        hx2 = self.adfuse2([hx12,hx22])
-        hx3 = self.adfuse3([hx13,hx23,hx33])
-        hx4 = self.adfuse4([hx14,hx24,hx34,hx44])
-        hx5 = self.adfuse5([hx15,hx25,hx35,hx45,hx55])
-        hx6 = self.adfuse6([hx16,hx26,hx36,hx46,hx66])
+        hx1 = self.adfuse1(torch.cat([hx11],1))
+        hx2 = self.adfuse2(torch.cat([hx12,hx22],1))
+        hx3 = self.adfuse3(torch.cat([hx13,hx23,hx33],1))
+        hx4 = self.adfuse4(torch.cat([hx14,hx24,hx34,hx44],1))
+        hx5 = self.adfuse5(torch.cat([hx15,hx25,hx35,hx45,hx55],1))
+        hx6 = self.adfuse6(torch.cat([hx16,hx26,hx36,hx46,hx66],1))
 
         hx6up = _upsample_like(self.con_upd6(torch.cat((hx6,hx66),1)),hx5)
         #-------------------- decoder --------------------

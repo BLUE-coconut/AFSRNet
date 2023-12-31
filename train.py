@@ -12,16 +12,16 @@ import torchvision
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
+from torch.utils.data import DataLoader
+from torchvision import transforms
 import torch.optim as optim
-import torchvision.transforms as standard_transforms
 
-from data_loader import oRescale
-from data_loader import oRescaleT
-from data_loader import oRandomCrop
-from data_loader import oToTensor
-from data_loader import oToTensorLab
+
+from data_loader import Rescale
+from data_loader import RescaleT
+from data_loader import RandomCrop
+from data_loader import ToTensor
+from data_loader import ToTensorLab
 from data_loader import SalObjDataset
 
 
@@ -54,11 +54,11 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
     # ------- 2. set the directory of training dataset --------
     
     if(resume_name and resume_file):
-        resume_dir = os.path.join('/root', 'autodl-tmp', 'saved_models', resume_name, resume_file)
+        resume_dir = os.path.join(os.getcwd(), 'saved_models', resume_name, resume_file)
     else:
         resume_dir = None
         
-    model_dir = os.path.join('/root', 'autodl-tmp','saved_models', save_name + os.sep)
+    model_dir = os.path.join('saved_models', save_name + os.sep)
     print("resume dir:{}".format(resume_dir))
     print("save dir:{}".format(model_dir))
     if(not os.path.exists(model_dir)):
@@ -85,21 +85,23 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
         img_name_list=tra_img_name_list,
         lbl_name_list=tra_lbl_name_list,
         transform=transforms.Compose([
-            oRescaleT(320),
-            oRandomCrop(288),
-            oToTensorLab(flag=0)]))
+            RescaleT(320),
+            RandomCrop(288),
+            ToTensorLab(flag=0)]))
     salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=4, drop_last=True) #shuffle=True 乱序
 
     # ------- 3. define model --------
     
     net = get_model(save_name)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    net = nn.DataParallel(net)
-    net.to(device)
-        
-
-    if(resume_dir):
-        net.load_state_dict(torch.load(resume_dir, map_location=device),strict = False)
+    if (resume_dir):
+        if torch.cuda.is_available():
+            net.load_state_dict(torch.load(resume_dir), strict=True)
+            net.cuda()
+        else:
+            net.load_state_dict(torch.load(resume_dir, map_location='cpu'), strict=True)
+    else:
+        if torch.cuda.is_available():
+            net.cuda()
       
 
     # ------- 4. define optimizer --------
@@ -108,7 +110,7 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
 
     # ------- 5. training process --------
     print("---start training...")
-    ite_num = 101000
+    ite_num = 0
     running_loss = 0.0
     running_tar_loss = 0.0
     ite_num4val = 0
@@ -165,4 +167,4 @@ def train(datas='sirst',save_name = 'hh2_sir',epoch_num = 500,batch_size_train =
 
 if __name__ == '__main__':
     # dataset:  IRSTD/NUDT-SIRST/sirst50
-    train(datas="NUDT",save_name="MFSRNet_NUDT",epoch_num=750,save_frq=1000,batch_size_train = 3, resume_name = 'MFSRNet_NUDT',resume_file = "MFSRNet_NUDT_bce_itr_101000.pth") #
+    train(datas="NUDT",save_name="MFSRNet_NUDT",epoch_num=500,save_frq=1000,batch_size_train = 3) #, resume_name = 'MFSRNet_NUDT',resume_file = "MFSRNet_NUDT_bce_itr_101000.pth"

@@ -16,15 +16,17 @@ class con_up_fusion(nn.Module):
         nn.Sigmoid()
     )
 
-    def forward(self, con):
-        y_con = torch.mean(con, dim=2, keepdim=True)  # (bs,channel,1,W)
-        x_con = torch.mean(con, dim=3, keepdim=True)  # (bs,channel,H,1)
-        mul_con = torch.matmul(x_con, y_con)  # (bs,channel,H,W)
+    def forward(self, con, vis = False):
+        x_con = torch.mean(con, dim=2, keepdim=True)  # (bs,channel,1,W)
+        y_con = torch.mean(con, dim=3, keepdim=True)  # (bs,channel,H,1)
+        mul_con = torch.matmul(y_con, x_con)  # (bs,channel,H,W)
         ch_con_max = torch.max(con, dim=1, keepdim=True)  # (bs,1,H,W)
         conw = self.confuse(mul_con * ch_con_max[0])
         out = conw * con
-
-        return out
+        if vis:
+            return [out,mul_con,ch_con_max[0]]
+        else:
+            return out
 
 
 class REBNCONV(nn.Module):
@@ -508,6 +510,7 @@ class MFSRNet(nn.Module):
         con_up2 = self.con_upd2(self.con2(hx22)+hx2)  # 128
         hx2d = self.stage2d(torch.cat((con_up2, hx3dup), 1))[0]  # 128 + 128 --> 64
         hx2dup = _upsample_like(hx2d, hx1)
+        vis = [hx22,hx2]+self.con2(hx22,vis=True) # encoder,aff,sfr,woMax,woXY
 
         
         con_up1 = self.con_upd1(self.con1(hx11)+hx1)  # 64
@@ -533,4 +536,4 @@ class MFSRNet(nn.Module):
 
         d0 = self.outconv(torch.cat((d1, d2, d3, d4, d5, d6), 1))
 
-        return F.sigmoid(d0), F.sigmoid(d1), F.sigmoid(d2), F.sigmoid(d3), F.sigmoid(d4), F.sigmoid(d5), F.sigmoid(d6)#, vis
+        return F.sigmoid(d0), F.sigmoid(d1), F.sigmoid(d2), F.sigmoid(d3), F.sigmoid(d4), F.sigmoid(d5), F.sigmoid(d6), vis

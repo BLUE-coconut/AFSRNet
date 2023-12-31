@@ -46,10 +46,11 @@ def get_test_data(data_name):
         lbl_name_list = glob.glob(lbl_dir + '*.png')
         img_dict = dict()
         lbl_dict = dict()
+        print()
         for i in img_name_list:
-            img_dict[i.split('/')[2].split('.')[0]] = i
+            img_dict[i.split('//')[1].split('.')[0]] = i
         for i in lbl_name_list:
-            lbl_dict[i.split('/')[2].split('.')[0]] = i
+            lbl_dict[i.split('//')[1].split('.')[0]] = i
 
         image_name_list = []
         label_name_list = []
@@ -71,9 +72,9 @@ def get_test_data(data_name):
         img_dict = dict()
         lbl_dict = dict()
         for i in img_name_list:
-            img_dict[i.split('/')[2].split('.')[0]] = i
+            img_dict[i[-10:].split('.')[0]] = i
         for i in lbl_name_list:
-            lbl_dict[i.split('/')[2].split('.')[0]] = i
+            lbl_dict[i[-10:].split('.')[0]] = i
 
         image_name_list = []
         label_name_list = []
@@ -314,10 +315,3 @@ def get_imagelist(datas):
         print("wrong dataset")
         return
 
-
-'''
-if __name__=='__main__':
-    _ , lbl_list = get_imagelist('sirst_all')
-
-    split_map(image_list=lbl_list,savepath="sirst/details/")
-#look_up("./saved_models/hhl3_sir/hhl3_sir_sirst_bce_itr_52000_train_0.004080_tar_0.000106.pth")'''

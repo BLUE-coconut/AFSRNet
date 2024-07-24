@@ -1,4 +1,4 @@
-# Adaptive-Feature-Fusion-and-Spatial-Refinement-Network-for-Infrared-Small-Object-Detection
+# AFSRNet
 Adaptive-Feature-Fusion-and-Spatial-Refinement-Network-for-Infrared-Small-Object-Detection
 
 ## Usage

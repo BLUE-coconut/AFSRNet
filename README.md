@@ -3,10 +3,6 @@ Adaptive-Feature-Fusion-and-Spatial-Refinement-Network-for-Infrared-Small-Object
 
 ## Usage
 
-We also provide the trained model and predicted saliency maps (GoogleDrive or baidu extraction code: )
+We have provided the prediction results of our network in this repository.
+The code will be shared later.
 
-## Quantitative Comparison
-
-## Qualitative Comparison
-
-## Citation
